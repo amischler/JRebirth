@@ -47,7 +47,8 @@
 		<!-- <module>form</module> -->
 		<module>undoredo</module>
 		<module>showcase</module>
-	</modules>
+        <module>fxform</module>
+    </modules>
 
 	<issueManagement>
 		<system>GitHub Issue Tracker</system>

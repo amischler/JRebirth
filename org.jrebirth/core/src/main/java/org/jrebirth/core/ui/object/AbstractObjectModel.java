@@ -39,7 +39,7 @@ import org.jrebirth.core.util.ClassUtility;
 public abstract class AbstractObjectModel<M extends Model, V extends View<?, ?, ?>, O extends Object> extends AbstractModel<M, V> {
 
     /** The dedicated view component. */
-    private O object;
+    protected O object;
 
     /**
      * Return the bindable object and create it if null.

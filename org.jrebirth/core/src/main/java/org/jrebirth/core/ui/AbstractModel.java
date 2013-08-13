@@ -37,7 +37,7 @@ import org.jrebirth.core.wave.Wave;
 public abstract class AbstractModel<M extends Model, V extends View<?, ?, ?>> extends AbstractBaseModel<M> {
 
     /** The dedicated view component. */
-    private transient V view;
+    protected transient V view;
 
     /**
      * {@inheritDoc}
