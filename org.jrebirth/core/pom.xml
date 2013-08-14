@@ -26,6 +26,13 @@
 			<version>1.0.6</version>
 			<scope>test</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>com.jolira</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 </project>
