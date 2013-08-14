@@ -2,13 +2,13 @@
  * Get more info at : www.jrebirth.org .
  * Copyright JRebirth.org © 2011-2013
  * Contact : sebastien.bordes@jrebirth.org
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +16,6 @@
  * limitations under the License.
  */
 package org.jrebirth.core.application;
-
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URL;
-import java.util.List;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -30,7 +26,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import org.jrebirth.core.concurrent.AbstractJrbRunnable;
 import org.jrebirth.core.concurrent.JRebirth;
 import org.jrebirth.core.concurrent.JRebirthThread;
@@ -40,24 +35,29 @@ import org.jrebirth.core.exception.handler.DefaultUncaughtExceptionHandler;
 import org.jrebirth.core.exception.handler.JatUncaughtExceptionHandler;
 import org.jrebirth.core.exception.handler.JitUncaughtExceptionHandler;
 import org.jrebirth.core.exception.handler.PoolUncaughtExceptionHandler;
+import org.jrebirth.core.facade.FacadeReady;
+import org.jrebirth.core.facade.Factory;
 import org.jrebirth.core.resource.ResourceBuilders;
 import org.jrebirth.core.resource.font.FontItem;
 import org.jrebirth.core.resource.provided.JRebirthParameters;
 import org.jrebirth.core.resource.provided.JRebirthStyles;
 import org.jrebirth.core.resource.style.StyleSheetItem;
 import org.jrebirth.core.util.ClassUtility;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
+import java.util.List;
+
 /**
- * 
+ *
  * The abstract class <strong>AbstractApplication</strong> is the base class of a JRebirth Application.
- * 
+ *
  * This the class to extend if you want to build an application using JRebirth WCS-MVC (Wave-Command-Service-Model-View-Controller).
- * 
+ *
  * @author Sébastien Bordes
- * 
+ *
  * @param <P> The root node of the stage, must extends Pane to allow children management
  */
 @Configuration(".*jrebirth")
@@ -80,6 +80,11 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /** The root node of the scene built by reflection. */
     private transient P rootNode;
+
+    /**
+     * The application factory.
+     */
+    private Factory factory;
 
     /**
      * {@inheritDoc}
@@ -214,7 +219,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Customize the primary stage.
-     * 
+     *
      * @param stage the primary stage to customize
      */
     protected abstract void customizeStage(final Stage stage);
@@ -274,21 +279,21 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Return the list of FontEnum to load for CSS.
-     * 
+     *
      * @return the list of fontEnum to load
      */
     protected abstract List<FontItem> getFontToPreload();
 
     /**
      * Customize the default scene.
-     * 
+     *
      * @param scene the scene to customize
      */
     protected abstract void customizeScene(final Scene scene);
 
     /**
      * Attach a new CSS file to the scene using the default classloader.
-     * 
+     *
      * @param scene the scene that will hold this new CSS file
      * @param styleSheetItem the stylesheet item to add
      */
@@ -305,14 +310,14 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Return the application title.
-     * 
+     *
      * This method could be overridden.
-     * 
+     *
      * By default it will will return {@link JRebirthParameters.APPLICATION_NAME} {@link JRebirthParameters.APPLICATION_VERSION} string.
-     * 
+     *
      * The default application is: ApplicationClass powered by JRebirth <br />
      * If version is equals to "0.0.0", it will not be appended
-     * 
+     *
      * @return the application title
      */
     protected String getApplicationTitle() {
@@ -331,7 +336,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Return the application class name without the Application suffix.
-     * 
+     *
      * @return the application class short name
      */
     private String getShortClassName() {
@@ -344,7 +349,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Attach default CSS file if none have been previously attached.
-     * 
+     *
      * @param scene the scene to check
      */
     private void manageDefaultStyleSheet(final Scene scene) {
@@ -358,11 +363,11 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Initialize the properties of the scene.
-     * 
+     *
      * 800x600 with transparent background and a Region as Parent Node
-     * 
+     *
      * @return the scene built
-     * 
+     *
      * @throws CoreException if build fails
      */
     protected final Scene buildScene() throws CoreException {
@@ -376,7 +381,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Build dynamically the root pane.
-     * 
+     *
      * @return the root pane
      * @throws CoreException if build fails
      */
@@ -439,7 +444,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
      * Return the #KeyCode used to put the application in full screen mode.<br />
      * Can be overridden<br />
      * Default is F11<br />
-     * 
+     *
      * @return the full screen shortcut
      */
     protected KeyCode getFullScreenKeyCode() {
@@ -450,7 +455,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
      * Return the #KeyCode used to iconify the application.<br />
      * Can be overridden<br />
      * Default is F10<br />
-     * 
+     *
      * @return the iconify shortcut
      */
     protected KeyCode getIconifiedKeyCode() {
@@ -459,7 +464,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Build and return the Default Uncaught Exception Handler for All threads which don't have any handler.
-     * 
+     *
      * @return the uncaught exception handler for All threads which don't have any handler.
      */
     protected UncaughtExceptionHandler getDefaultUncaughtExceptionHandler() {
@@ -468,7 +473,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Build and return the Uncaught Exception Handler for JavaFX Application Thread.
-     * 
+     *
      * @return the uncaught exception handler for JavaFX Application Thread
      */
     protected UncaughtExceptionHandler getJatUncaughtExceptionHandler() {
@@ -477,7 +482,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Build and return the Uncaught Exception Handler for JRebirth Internal Thread.
-     * 
+     *
      * @return the uncaught exception handler for JRebirth Internal Thread
      */
     protected UncaughtExceptionHandler getJitUncaughtExceptionHandler() {
@@ -486,10 +491,30 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
 
     /**
      * Build and return the Uncaught Exception Handler for JRebirth Thread Pool.
-     * 
+     *
      * @return the uncaught exception handler for JRebirth Thread Pool
      */
     public UncaughtExceptionHandler getPoolUncaughtExceptionHandler() {
         return new PoolUncaughtExceptionHandler();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Factory getFactory() {
+        if (factory == null) {
+            factory = new Factory() {
+                @Override
+                public <R extends FacadeReady> R call(Class<R> clazz) throws CoreException {
+                    try {
+                        return clazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new CoreException(e);
+                    }
+                }
+            };
+        }
+        return factory;
     }
 }
