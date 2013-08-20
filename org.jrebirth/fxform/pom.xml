@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>jrebirth</artifactId>
-        <groupId>org</groupId>
-        <version>0.7.5-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org</groupId>
+		<artifactId>jrebirth</artifactId>
+		<version>0.7.5-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
-    <artifactId>fxform</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>org.jrebirth</groupId>
-            <artifactId>core</artifactId>
-            <version>0.7.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dooapp.fxform2</groupId>
-            <artifactId>core</artifactId>
-            <version>0.2.2</version>
-        </dependency>
-    </dependencies>
+	<groupId>org.jrebirth</groupId>
+	<artifactId>fxform</artifactId>
+	<name>FXForm</name>
+	<description>Integration of FXForm into JRebirth</description>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.jrebirth</groupId>
+			<artifactId>core</artifactId>
+			<version>0.7.5-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.dooapp.fxform2</groupId>
+			<artifactId>core</artifactId>
+			<version>0.2.2</version>
+
+			<exclusions>
+				<exclusion>
+					<groupId>javafx</groupId>
+					<artifactId>javafx</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.6</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
 </project>

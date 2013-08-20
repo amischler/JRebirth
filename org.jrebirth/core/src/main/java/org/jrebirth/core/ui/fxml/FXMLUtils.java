@@ -19,6 +19,7 @@ package org.jrebirth.core.ui.fxml;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXMLLoader;
@@ -28,12 +29,18 @@ import javafx.scene.text.TextBuilder;
 import org.jrebirth.core.exception.CoreRuntimeException;
 import org.jrebirth.core.ui.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The class <strong>FXMLUtils</strong>.
  * 
  * @author Sébastien Bordes
  */
 public final class FXMLUtils {
+
+    /** The class logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FXMLUtils.class);
 
     /**
      * Private constructor.
@@ -85,8 +92,12 @@ public final class FXMLUtils {
         final FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(convertFxmlUrl(model, fxmlPath));
 
-        if (bundlePath != null) {
-            fxmlLoader.setResources(ResourceBundle.getBundle(bundlePath));
+        try {
+            if (bundlePath != null) {
+                fxmlLoader.setResources(ResourceBundle.getBundle(bundlePath));
+            }
+        } catch (final MissingResourceException e) {
+            LOGGER.error("Resource Bundle is missing:  " + bundlePath);
         }
 
         Node node = null;

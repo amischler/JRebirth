@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class PageModel.
+ * The Class StackModel is used to manage a StackPane that show other Model.
+ * 
+ * @author Sébastien Bordes
  */
 public class StackModel extends DefaultModel<StackModel, StackView> {
 
@@ -44,10 +46,26 @@ public class StackModel extends DefaultModel<StackModel, StackView> {
     @Override
     protected void initModel() {
 
+        // Listen StackWaves to be aware of any changes
         listen(StackWaves.SHOW_PAGE_MODEL);
         listen(StackWaves.SHOW_PAGE_ENUM);
+    }
 
-        getModelObject();
+    /**
+     * Show page.
+     * 
+     * Called when model received a SHOW_PAGE wave type.
+     * 
+     * @param pageModelKey the modelKey for the page to show
+     * @param stackName the unique string tha t identify the stack
+     * 
+     * @param wave the wave
+     */
+    public void doShowPageModel(final UniqueKey<? extends Model> pageModelKey, final String stackName, final Wave wave) {
+
+        if (getStackName() != null && getStackName().equals(stackName)) {
+            showPage(pageModelKey);
+        }
 
     }
 
@@ -56,18 +74,61 @@ public class StackModel extends DefaultModel<StackModel, StackView> {
      * 
      * Called when model received a SHOW_PAGE wave type.
      * 
-     * @param page the page
+     * @param pageEnum the page enum for the model to show
      * @param wave the wave
      */
-    public void doShowPageModel(final UniqueKey<? extends Model> pageModelKey, final Wave wave) {
+    public void doShowPageEnum(final PageEnum pageEnum, final Wave wave) {
 
+        LOGGER.info("Show Page Enum: " + pageEnum.toString());
+        if (getPageEnumClass() != null && getPageEnumClass().equals(pageEnum.getClass())) {
+            showPage(pageEnum.getModelKey());
+        }
+    }
+
+    /**
+     * Returns the page enum class associated to this model.
+     * 
+     * Checks the modelObject and return it only if it extends {@link PageEnum}
+     * 
+     * @return the page enum class
+     */
+    @SuppressWarnings("unchecked")
+    private Class<? extends PageEnum> getPageEnumClass() {
+        Class<? extends PageEnum> res = null;
+        if (getModelObject() instanceof Class && PageEnum.class.isAssignableFrom((Class<?>) getModelObject())) {
+            res = (Class<? extends PageEnum>) getModelObject();
+        }
+        return res;
+    }
+
+    /**
+     * Returns the current stack name associated to this model.
+     * 
+     * Checks the modelObject and return it only if it is a String
+     * 
+     * @return the stack name
+     */
+    private String getStackName() {
+        String res = null;
+        if (getModelObject() instanceof String) {
+            res = (String) getModelObject();
+        }
+        return res;
+    }
+
+    /**
+     * Private method used to show another page.
+     * 
+     * @param pageModelKey the mdoelKey for the page to show
+     */
+    private void showPage(final UniqueKey<? extends Model> pageModelKey) {
         LOGGER.info("Show Page Model: " + pageModelKey.toString());
 
         // Create the Wave Bean that will hold all data processed by chained commands
         final DisplayModelWaveBean waveBean = new DisplayModelWaveBean();
         // Define the placeholder that will receive the content
         waveBean.setChidrenPlaceHolder(getView().getRootNode().getChildren());
-        // Allow to add element behin the stack to allow transition
+        // Allow to add element behind the stack to allow transition
         waveBean.setAppendChild(false);
 
         waveBean.setShowModelKey(pageModelKey);
@@ -76,21 +137,6 @@ public class StackModel extends DefaultModel<StackModel, StackView> {
         this.currentModelKey = waveBean.getShowModelKey();
 
         callCommand(ShowFadingModelCommand.class, waveBean);
-    }
-
-    /**
-     * Show page.
-     * 
-     * Called when model received a SHOW_PAGE wave type.
-     * 
-     * @param page the page
-     * @param wave the wave
-     */
-    public void doShowPageEnuModel(final PageEnum pageEnum, final Wave wave) {
-
-        LOGGER.info("Show Page Enum: " + pageEnum.toString());
-
-        doShowPageModel(pageEnum.getModelKey(), wave);
     }
 
     /**
