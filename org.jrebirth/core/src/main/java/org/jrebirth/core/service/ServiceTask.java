@@ -17,26 +17,19 @@
  */
 package org.jrebirth.core.service;
 
+import javafx.concurrent.Task;
+import org.jrebirth.core.exception.CoreException;
+import org.jrebirth.core.exception.WaveException;
+import org.jrebirth.core.link.AbstractWaveReady;
+import org.jrebirth.core.wave.*;
+import org.jrebirth.core.wave.Wave.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import javafx.concurrent.Task;
-
-import org.jrebirth.core.exception.CoreException;
-import org.jrebirth.core.exception.WaveException;
-import org.jrebirth.core.link.AbstractWaveReady;
-import org.jrebirth.core.wave.Wave;
-import org.jrebirth.core.wave.Wave.Status;
-import org.jrebirth.core.wave.WaveBuilder;
-import org.jrebirth.core.wave.WaveData;
-import org.jrebirth.core.wave.WaveItem;
-import org.jrebirth.core.wave.WaveType;
-import org.jrebirth.core.wave.WaveTypeBase;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The class <strong>ServiceTask</strong>.
@@ -140,5 +133,25 @@ final class ServiceTask<T> extends Task<T> {
             LOGGER.error("Unable to perform the service task", e);
         }
         return res;
+    }
+
+    @Override
+    public void updateProgress(long l, long l2) {
+        super.updateProgress(l, l2);
+    }
+
+    @Override
+    public void updateProgress(double v, double v2) {
+        super.updateProgress(v, v2);
+    }
+
+    @Override
+    public void updateMessage(String s) {
+        super.updateMessage(s);
+    }
+
+    @Override
+    public void updateTitle(String s) {
+        super.updateTitle(s);
     }
 }
