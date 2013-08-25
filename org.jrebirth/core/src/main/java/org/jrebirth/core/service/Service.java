@@ -17,7 +17,6 @@
  */
 package org.jrebirth.core.service;
 
-import javafx.concurrent.Worker;
 import org.jrebirth.core.facade.FacadeReady;
 import org.jrebirth.core.wave.Wave;
 
@@ -29,7 +28,7 @@ import org.jrebirth.core.wave.Wave;
  * 
  * @author Sébastien Bordes
  */
-public interface Service extends FacadeReady<Service>, Worker {
+public interface Service extends FacadeReady<Service> {
 
     /**
      * Do a specific action by processing the wave.
