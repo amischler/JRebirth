@@ -26,7 +26,6 @@ import javafx.concurrent.Task;
 
 import org.jrebirth.core.exception.CoreException;
 import org.jrebirth.core.exception.WaveException;
-import org.jrebirth.core.link.AbstractWaveReady;
 import org.jrebirth.core.wave.Wave;
 import org.jrebirth.core.wave.Wave.Status;
 import org.jrebirth.core.wave.WaveBuilder;
@@ -45,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @param <T> the current Service Task type
  */
-final class ServiceTask<T> extends Task<T> {
+public final class ServiceTask<T> extends Task<T> {
 
     /** The class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTask.class);
@@ -63,7 +62,7 @@ final class ServiceTask<T> extends Task<T> {
     /**
      * The <code>localService</code>.
      */
-    private final AbstractWaveReady<Service> service;
+    private final Service service;
 
     /**
      * The <code>sourceWave</code>.
@@ -73,12 +72,12 @@ final class ServiceTask<T> extends Task<T> {
     /**
      * Default Constructor only visible by service package.
      * 
-     * @param parameterValues the lsit of function parameter
+     * @param parameterValues the list of function parameter
      * @param method the method to call
      * @param service the service object
      * @param wave the wave to process
      */
-    ServiceTask(final AbstractWaveReady<Service> service, final Method method, final Object[] parameterValues, final Wave wave) {
+    ServiceTask(final Service service, final Method method, final Object[] parameterValues, final Wave wave) {
         super();
         this.service = service;
         this.method = method;
@@ -87,9 +86,27 @@ final class ServiceTask<T> extends Task<T> {
     }
 
     /**
+     * Return the full service handler name.
+     * 
+     * ServiceName + method + ( parameters types )
+     * 
+     * @return the full service handler name
+     */
+    public String getServiceHandlerName() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.service.getClass().getSimpleName()).append(".");
+        sb.append(this.method.getName()).append("(");
+        for (final Class<?> parameterType : this.method.getParameterTypes()) {
+            sb.append(parameterType.getSimpleName()).append(", ");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @throws CoreException if return wavetype has bad API
+     * @throws CoreException if return WaveType has bad API
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -130,15 +147,59 @@ final class ServiceTask<T> extends Task<T> {
                         .data(WaveData.build(waveItem, res))
                         .build();
                 returnWave.setRelatedWave(this.wave);
-                returnWave.addWaveListener(new ServiceWaveListener());
+                returnWave.addWaveListener(new ServiceTaskReturnWaveListener());
 
                 // Send the return wave to interested components
                 this.service.sendWave(returnWave);
 
             }
+
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            LOGGER.error("Unable to perform the service task", e);
+            LOGGER.error("Unable to perform the Service Task " + getServiceHandlerName(), e);
         }
         return res;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateProgress(final long workDone, final long totalWork) {
+        super.updateProgress(workDone, totalWork);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateProgress(final double workDone, final double totalWork) {
+        super.updateProgress(workDone, totalWork);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateMessage(final String message) {
+        super.updateMessage(message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateTitle(final String title) {
+        super.updateTitle(title);
+    }
+
+    /**
+     * The task has complete because the source wave was consumed.
+     * 
+     * Remove the task from the service pending list
+     */
+    public void taskDone() {
+        // We can now remove the pending task (even if the return wave isn't processed TO CHECK)
+        this.service.removePendingTask(this.wave.getWUID());
+    }
+
 }

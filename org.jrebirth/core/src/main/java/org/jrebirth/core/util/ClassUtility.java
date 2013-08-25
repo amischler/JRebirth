@@ -42,6 +42,9 @@ import org.slf4j.LoggerFactory;
  */
 public final class ClassUtility {
 
+    /** The separator use in upper case to simulate a acamleCase change. */
+    private static final String CASE_SEPARATOR = "_";
+
     /** The separator used for serialization. */
     public static final String SEPARATOR = "|";
 
@@ -70,14 +73,14 @@ public final class ClassUtility {
      * Build the nth generic type of a class.
      * 
      * @param mainClass The main class used (that contain at least one generic type)
-     * @param superTypeIndex the index of the generic type we want to instantiate set to the parent extended
+     * @param assignableClass the type of the generic to build
      * @param parameters used by the constructor of the generic type
      * 
      * @return a new instance of the generic type
      * 
      * @throws CoreException if the instantiation fails
      */
-    public static Object buildGenericType(final Class<?> mainClass, final int superTypeIndex, final Object... parameters) throws CoreException {
+    public static Object buildGenericType(final Class<?> mainClass, final Class<?> assignableClass, final Object... parameters) throws CoreException {
         Class<?> genericClass = null;
         // Copy parameters type to find the right constructor
         final Class<?>[] parameterTypes = new Class<?>[parameters.length];
@@ -90,7 +93,7 @@ public final class ClassUtility {
                 i++;
             }
 
-            genericClass = getGenericClass(mainClass, superTypeIndex);
+            genericClass = findGenericClass(mainClass, assignableClass);
 
             // Find the right constructor and use arguments to create a new
             // instance
@@ -101,7 +104,7 @@ public final class ClassUtility {
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | SecurityException e) {
             final String message = genericClass == null
-                    ? "Impossible to build the dedicated " + superTypeIndex + " th type of the class " + mainClass.getName()
+                    ? "Impossible to build the object assignable to " + assignableClass.getName() + " for the class " + mainClass.getName()
                     : "Impossible to build the " + genericClass.getName() + " object for the class " + mainClass.getName();
             LOGGER.error(message, e);
 
@@ -125,32 +128,39 @@ public final class ClassUtility {
      * @return the right constructor that matchers parameters
      */
     private static Constructor<?> getConstructor(final Class<?> genericClass, final Class<?>[] parameterTypes) {
+        Constructor<?> constructor = null;
         try {
-            return genericClass.getConstructor(parameterTypes);
+            constructor = genericClass.getConstructor(parameterTypes);
         } catch (final NoSuchMethodException e) {
-            return genericClass.getConstructors()[0];
+            // Return the first constructor as a workaround
+            constructor = genericClass.getConstructors()[0];
         } catch (final SecurityException e) {
+            LOGGER.error("Impossible to retrieve the constructor due to security", e);
             throw e;
         }
+        return constructor;
     }
 
     /**
      * Return the generic class for the given parent class and index.
      * 
      * @param mainClass the parent class
-     * @param superTypeIndex the index of the generic type to return
+     * @param assignableClass the type of the generic type to find
      * 
      * @return the class of the generic type according to the index provided or null if not found
      */
-    public static Class<?> getGenericClass(final Class<?> mainClass, final int superTypeIndex) {
+    public static Class<?> findGenericClass(final Class<?> mainClass, final Class<?> assignableClass) {
 
         // Retrieve the generic super class Parameterized type
         final ParameterizedType paramType = (ParameterizedType) mainClass.getGenericSuperclass();
 
         Class<?> genericClass = null;
-        if (superTypeIndex < paramType.getActualTypeArguments().length) {
-            // Retrieve the right generic type we want to instantiate
-            genericClass = getClassFromType(paramType.getActualTypeArguments()[superTypeIndex]);
+        Class<?> tempClass = null;
+        for (int i = 0; genericClass == null && i < paramType.getActualTypeArguments().length; i++) {
+            tempClass = getClassFromType(paramType.getActualTypeArguments()[i]);
+            if (assignableClass.isAssignableFrom(tempClass)) {
+                genericClass = tempClass;
+            }
         }
 
         return genericClass;
@@ -166,7 +176,7 @@ public final class ClassUtility {
     public static String underscoreToCamelCase(final String undescoredString) {
 
         // Split the string for each underscore
-        final String[] parts = undescoredString.split("_");
+        final String[] parts = undescoredString.split(CASE_SEPARATOR);
         final StringBuilder camelCaseString = new StringBuilder(undescoredString.length());
         camelCaseString.append(parts[0].toLowerCase(Locale.getDefault()));
 
@@ -193,9 +203,9 @@ public final class ClassUtility {
         final StringBuilder sb = new StringBuilder();
         for (final String camelPart : camelCaseString.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])")) {
             if (sb.length() > 0) {
-                sb.append("_");
+                sb.append(CASE_SEPARATOR);
             }
-            sb.append(camelPart.toUpperCase());
+            sb.append(camelPart.toUpperCase(Locale.getDefault()));
         }
         return sb.toString();
     }
@@ -217,6 +227,13 @@ public final class ClassUtility {
         throw new NoSuchMethodException(action);
     }
 
+    /**
+     * List all properties for the given class.
+     * 
+     * @param cls the class to inspect by reflection
+     * 
+     * @return the field list
+     */
     public static List<Field> retrievePropertyList(final Class<?> cls) {
         final List<Field> propertyList = new ArrayList<>();
         for (final Field f : cls.getFields()) {

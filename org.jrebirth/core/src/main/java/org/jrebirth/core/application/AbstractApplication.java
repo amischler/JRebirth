@@ -329,7 +329,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
         // Add version with a space before
         final String version = JRebirthParameters.APPLICATION_VERSION.get();
         if (!"0.0.0".equals(version)) {
-            name += " " + version;
+            name = name + " " + version;
         }
         return name;
     }
@@ -387,7 +387,7 @@ public abstract class AbstractApplication<P extends Pane> extends Application im
      */
     @SuppressWarnings("unchecked")
     protected P buildRootPane() throws CoreException {
-        this.rootNode = (P) ClassUtility.buildGenericType(this.getClass(), 0);
+        this.rootNode = (P) ClassUtility.buildGenericType(this.getClass(), Pane.class);
         return this.rootNode;
     }
 

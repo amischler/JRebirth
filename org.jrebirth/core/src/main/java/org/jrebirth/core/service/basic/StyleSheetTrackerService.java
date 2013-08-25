@@ -23,18 +23,18 @@ import javafx.scene.Scene;
 
 import com.sun.javafx.css.StyleManager;
 
-import org.jrebirth.core.service.ServiceBase;
+import org.jrebirth.core.service.DefaultService;
 import org.jrebirth.core.wave.WaveTypeBase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The class <strong>StageService</strong>.
+ * The class <strong>StyleSheetTrackerService</strong>.
  * 
  * @author Sébastien Bordes
  */
-public class StyleSheetTrackerService extends ServiceBase {
+public class StyleSheetTrackerService extends DefaultService {
 
     /** Wave type use to load events. */
     public static final WaveTypeBase DO_OPEN_STAGE = WaveTypeBase.build("OPEN_STAGE");

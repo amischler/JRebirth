@@ -17,6 +17,9 @@
  */
 package org.jrebirth.core.ui;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+
 import javafx.animation.Animation;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -25,9 +28,9 @@ import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextAreaBuilder;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.PaneBuilder;
+
 import org.jrebirth.core.exception.CoreException;
 import org.jrebirth.core.facade.JRebirthEventType;
 import org.jrebirth.core.ui.annotation.AutoHandler;
@@ -37,12 +40,9 @@ import org.jrebirth.core.ui.annotation.OnFinished;
 import org.jrebirth.core.ui.annotation.RootNodeId;
 import org.jrebirth.core.ui.handler.AnnotationEventHandler;
 import org.jrebirth.core.util.ClassUtility;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 /**
  * 
@@ -61,19 +61,22 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
     /** The class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractView.class);
 
+    /** The base name of all JRebirth Annotation. */
+    private static final String BASE_ANNOTATION_NAME = "org.jrebirth.core.ui.annotation.On";
+
     /** The view model. */
     private final transient M model;
 
     /** The view controller. */
-    protected transient C controller;
+    private transient C controller;
 
     /** The root node of this view. */
-    protected transient N rootNode;
+    private transient N rootNode;
 
     /** The error node used if an error occurred. */
     private transient Pane errorNode;
 
-    /** The callback object to use for annoation event handler. */
+    /** The callback object to use for annotation event handler. */
     private Object callbackObject;
 
     /**
@@ -91,7 +94,7 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
 
         try {
             // Build the root node of the view
-            buildRootNode();
+            this.rootNode = buildRootNode();
 
             // Manage components controller
             buildController();
@@ -174,7 +177,7 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
         // For each View class annotation we will attach an event handler to the root node
         for (final Annotation a : this.getClass().getAnnotations()) {
             // Manage only JRebirth OnXxxxx annotations
-            if (a.annotationType().getName().startsWith("org.jrebirth.core.ui.annotation.On")) {
+            if (a.annotationType().getName().startsWith(BASE_ANNOTATION_NAME)) {
                 try {
                     // Process the annotation if the node is not null
                     if (getRootNode() != null && getController() instanceof AbstractController) {
@@ -236,7 +239,7 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
             if (Node.class.isAssignableFrom(property.getType())) {
 
                 // Manage only JRebirth OnXxxxx annotations
-                if (a.annotationType().getName().startsWith("org.jrebirth.core.ui.annotation.On")) {
+                if (a.annotationType().getName().startsWith(BASE_ANNOTATION_NAME)) {
 
                     try {
                         // Retrieve the property value
@@ -333,8 +336,8 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
      * @throws CoreException if introspection fails
      */
     @SuppressWarnings("unchecked")
-    protected void buildRootNode() throws CoreException {
-        this.rootNode = (N) ClassUtility.buildGenericType(this.getClass(), 1);
+    protected N buildRootNode() throws CoreException {
+        return (N) ClassUtility.buildGenericType(this.getClass(), Node.class);
     }
 
     /**
@@ -345,9 +348,9 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
     @SuppressWarnings("unchecked")
     protected void buildController() throws CoreException {
 
-        if (!NullController.class.equals(ClassUtility.getGenericClass(this.getClass(), 2))) {
+        if (!NullController.class.equals(ClassUtility.findGenericClass(this.getClass(), Controller.class))) {
             // Build the controller by introspection
-            this.controller = (C) ClassUtility.buildGenericType(this.getClass(), 2, this);
+            this.controller = (C) ClassUtility.buildGenericType(this.getClass(), Controller.class, this);
         }
     }
 
@@ -411,28 +414,6 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
     protected void finalize() throws Throwable {
         getModel().getLocalFacade().getGlobalFacade().trackEvent(JRebirthEventType.DESTROY_VIEW, null, this.getClass());
         super.finalize();
-    }
-
-    /**
-     * FIXME remove IT !!!
-     * 
-     * MUST ADD a dynamic resource implementation
-     * 
-     * Load an image.
-     * 
-     * @param resourceName the name of the image, path must be separated by '/'
-     * @return the image loaded
-     */
-    public Image loadImage(final String resourceName) {
-        Image image = null;
-        final InputStream imageInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-        if (imageInputStream != null) {
-            image = new Image(imageInputStream);
-        }
-        if (image == null) {
-            LOGGER.error("Image : " + resourceName + " not found !");
-        }
-        return image;
     }
 
 }
