@@ -17,9 +17,6 @@
  */
 package org.jrebirth.core.ui;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-
 import javafx.animation.Animation;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,7 +27,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextAreaBuilder;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.PaneBuilder;
-
 import org.jrebirth.core.exception.CoreException;
 import org.jrebirth.core.facade.JRebirthEventType;
 import org.jrebirth.core.ui.annotation.AutoHandler;
@@ -40,9 +36,11 @@ import org.jrebirth.core.ui.annotation.OnFinished;
 import org.jrebirth.core.ui.annotation.RootNodeId;
 import org.jrebirth.core.ui.handler.AnnotationEventHandler;
 import org.jrebirth.core.util.ClassUtility;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * 
@@ -68,10 +66,10 @@ public abstract class AbstractView<M extends Model, N extends Node, C extends Co
     private final transient M model;
 
     /** The view controller. */
-    private transient C controller;
+    protected transient C controller;
 
     /** The root node of this view. */
-    private transient N rootNode;
+    protected transient N rootNode;
 
     /** The error node used if an error occurred. */
     private transient Pane errorNode;
