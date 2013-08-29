@@ -17,14 +17,13 @@
  */
 package org.jrebirth.core.resource.fxml;
 
-import java.net.URL;
-
 import org.jrebirth.core.resource.factory.AbstractResourceBuilder;
 import org.jrebirth.core.ui.fxml.FXMLComponent;
 import org.jrebirth.core.ui.fxml.FXMLUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URL;
 
 /**
  * The class <strong>StyleSheetBuilder</strong>.
@@ -81,7 +80,7 @@ public final class FXMLBuilder extends AbstractResourceBuilder<FXMLItem, FXMLPar
         // sb.append(FXML_EXT);
         // }
 
-        return FXMLUtils.loadFXML(null, sb.toString());
+        return FXMLUtils.loadFXML(null, fxmlParam.absolutePath(), fxmlParam.absoluteBundlePath());
     }
 
     /**
