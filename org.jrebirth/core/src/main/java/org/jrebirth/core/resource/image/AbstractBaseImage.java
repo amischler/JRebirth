@@ -32,7 +32,7 @@ import org.jrebirth.core.resource.AbstractBaseParams;
 public abstract class AbstractBaseImage extends AbstractBaseParams implements ImageParams {
 
     /** The image path. */
-    private final StringProperty path = new SimpleStringProperty();
+    private final StringProperty path = new SimpleStringProperty(""); // Avoid NPE for path
 
     /** The image path. */
     private final StringProperty nameProperty = new SimpleStringProperty();
@@ -97,15 +97,15 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
      */
     @Override
     public String path() {
-        // Avoid NPE on path
-        return this.path.get() == null ? "" : this.path.get();
+        return this.path.get();
     }
 
     /**
-     * {@inheritDoc}
+     * Path property.
+     * 
+     * @return the string property
      */
     public StringProperty pathProperty() {
-        // Avoid NPE on path
         return this.path;
     }
 
@@ -118,7 +118,9 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
-     * {@inheritDoc}
+     * Name property.
+     * 
+     * @return the string property
      */
     public StringProperty nameProperty() {
         return this.nameProperty;
@@ -133,13 +135,17 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
-     * {@inheritDoc}
+     * Extension property.
+     * 
+     * @return the object property
      */
     public ObjectProperty<ImageExtension> extensionProperty() {
         return this.extensionProperty;
     }
 
     /**
+     * Requested width.
+     * 
      * @return Returns the requestedWidth.
      */
     public double requestedWidth() {
@@ -147,6 +153,8 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
+     * Requested height.
+     * 
      * @return Returns the requestedHeight.
      */
     public double requestedHeight() {
@@ -154,6 +162,8 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
+     * Preserve ratio.
+     * 
      * @return Returns the preserveRatio.
      */
     public boolean preserveRatio() {
@@ -161,6 +171,8 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
+     * Smooth.
+     * 
      * @return Returns the smooth.
      */
     public boolean smooth() {
@@ -168,6 +180,8 @@ public abstract class AbstractBaseImage extends AbstractBaseParams implements Im
     }
 
     /**
+     * Background loading.
+     * 
      * @return Returns the backgroundLoading.
      */
     public boolean backgroundLoading() {
