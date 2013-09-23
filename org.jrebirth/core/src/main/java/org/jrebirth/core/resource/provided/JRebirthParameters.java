@@ -52,6 +52,12 @@ public interface JRebirthParameters {
     /** The handler used while running in developer mode to manage unprocessed wave. */
     ParameterItem<Boolean> FOLLOW_UP_SERVICE_TASKS = create("followUpServiceTasks", false);
 
+    /**
+     * When true log code will be resolved according to Message_rb properties files. <br />
+     * Disable it to improve performances, log could be translated later.
+     */
+    ParameterItem<Boolean> LOG_RESOLUTION = create("logResolution", true);
+
     /** The handler used while running in developer mode to manage unprocessed wave. */
     ParameterItem<Class> UNPROCESSED_WAVE_HANDLER = create("unprocessedWaveHandler", (Class) DefaultUnprocessedWaveHandler.class);
 

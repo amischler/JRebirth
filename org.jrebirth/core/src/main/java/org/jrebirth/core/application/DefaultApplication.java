@@ -28,8 +28,24 @@ public class DefaultApplication<P extends Pane> extends AbstractApplication<P> {
      * {@inheritDoc}
      */
     @Override
+    protected void preInit() {
+        // Nothing to do yet
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void postInit() {
+        // Nothing to do yet
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Class<? extends Model> getFirstModelClass() {
-        throw new CoreRuntimeException("You must override getFirstModelClass without calling super.");
+        throw new CoreRuntimeException(OVERRIDE_FIRST_MODEL_CLASS.get());
     }
 
     /**
@@ -52,7 +68,7 @@ public class DefaultApplication<P extends Pane> extends AbstractApplication<P> {
      * {@inheritDoc}
      */
     @Override
-    public List<FontItem> getFontToPreload() {
+    protected List<FontItem> getFontToPreload() {
         return Collections.emptyList();
     }
 
